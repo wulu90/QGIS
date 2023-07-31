@@ -2066,10 +2066,6 @@ else()
   endif()
 endif()
 
-# Generate cpp+header file from .proto file using "protoc" tool (to support MVT encoding of vector tiles)
-protobuf_generate_cpp(VECTOR_TILE_PROTO_SRCS VECTOR_TILE_PROTO_HDRS vectortile/vector_tile.proto)
-set(QGIS_CORE_SRCS ${QGIS_CORE_SRCS} ${VECTOR_TILE_PROTO_SRCS})
-set(QGIS_CORE_HDRS ${QGIS_CORE_HDRS} ${VECTOR_TILE_PROTO_HDRS})
 if (NOT MSVC)
   # automatically generated file produces warnings (unused-parameter, unused-variable, misleading-indentation)
   set_source_files_properties(${VECTOR_TILE_PROTO_SRCS} PROPERTIES COMPILE_FLAGS -w)
@@ -2216,8 +2212,10 @@ set(IMAGE_RCCS ../../images/images.qrc)
 # qgis_core library
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
-add_library(qgis_core ${LIBRARY_TYPE} ${QGIS_CORE_SRCS} ${QGIS_CORE_HDRS} ${QGIS_CORE_PRIVATE_HDRS} ${IMAGE_RCCS})
-
+add_library(qgis_core ${LIBRARY_TYPE} ${QGIS_CORE_SRCS} ${QGIS_CORE_HDRS} ${QGIS_CORE_PRIVATE_HDRS} ${IMAGE_RCCS} vectortile/vector_tile.proto )
+# Generate cpp+header file from .proto file using "protoc" tool (to support MVT encoding of vector tiles)
+target_link_libraries(qgis_core protobuf::libprotobuf-lite)
+protobuf_generate(TARGET qgis_core)
 
 # require c++17
 target_compile_features(qgis_core PRIVATE cxx_std_17)
@@ -2250,7 +2248,6 @@ target_include_directories(qgis_core SYSTEM PUBLIC
   ${QCA_INCLUDE_DIR}
   ${QTKEYCHAIN_INCLUDE_DIR}
   ${${QT_VERSION_BASE}SerialPort_INCLUDE_DIRS}
-  ${Protobuf_INCLUDE_DIRS}
   ${ZLIB_INCLUDE_DIRS}
   ${EXIV2_INCLUDE_DIR}
 )
@@ -2427,7 +2424,6 @@ target_link_libraries(qgis_core
   ${EXPAT_LIBRARY}
   ${SQLITE3_LIBRARY}
   ${LIBZIP_LIBRARY}
-  ${Protobuf_LITE_LIBRARY}
   ${ZLIB_LIBRARIES}
   ${EXIV2_LIBRARY}
 )

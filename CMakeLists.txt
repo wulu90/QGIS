@@ -370,7 +370,7 @@ if(WITH_CORE)
     message (SEND_ERROR "sqlite3 dependency was not found!")
   endif()
 
-  find_package(Protobuf REQUIRED)   # for decoding of vector tiles in MVT format
+  find_package(Protobuf CONFIG REQUIRED)   # for decoding of vector tiles in MVT format
   message(STATUS "Found Protobuf: ${Protobuf_LIBRARIES}")
   if (NOT Protobuf_PROTOC_EXECUTABLE)
     message (SEND_ERROR "Protobuf library's 'protoc' tool was not found!")
